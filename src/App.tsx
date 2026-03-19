@@ -2,6 +2,8 @@ import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ConfigProvider } from "antd";
 import AppLayout from "./components/Layout/AppLayout";
+import ProductList from "./pages/ProductList/ProductList";
+import ProductDetails from "./pages/ProductDetails/ProductDetails";
 
 const theme = {
   token: {
@@ -16,7 +18,10 @@ const App: React.FC = () => {
     <ConfigProvider theme={theme}>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<AppLayout />} />
+          <Route element={<AppLayout />}>
+            <Route path="/" element={<ProductList />} />
+            <Route path="/products/:id" element={<ProductDetails />} />
+          </Route>
         </Routes>
       </BrowserRouter>
     </ConfigProvider>
