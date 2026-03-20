@@ -10,11 +10,12 @@ import {
 import type { Product } from "../../types/product";
 import { TableSkeleton } from "../../components/ProductSkeleton/ProductSkeleton";
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
 
 const ProductList: React.FC = () => {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(PAGE_SIZE_OPTIONS[1]);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | undefined>(
@@ -48,14 +49,19 @@ const ProductList: React.FC = () => {
     }
   }, []);
 
+  const handlePageSizeChange = useCallback((value: number) => {
+    setPageSize(value);
+    setCurrentPage(1);
+  }, []);
+
   const queryParams = useMemo(
     () => ({
-      limit: PAGE_SIZE,
-      skip: (currentPage - 1) * PAGE_SIZE,
+      limit: pageSize,
+      skip: (currentPage - 1) * pageSize,
       q: debouncedSearch || undefined,
       category: !debouncedSearch ? selectedCategory : undefined,
     }),
-    [currentPage, debouncedSearch, selectedCategory],
+    [currentPage, pageSize, debouncedSearch, selectedCategory],
   );
 
   const { data, isLoading, isFetching, error } =
@@ -205,6 +211,19 @@ const ProductList: React.FC = () => {
               .includes(input.toLowerCase())
           }
         />
+
+        <div className="filters-bar__right">
+          <Select
+            value={pageSize}
+            onChange={handlePageSizeChange}
+            options={PAGE_SIZE_OPTIONS.map((value) => ({
+              label: `${value} / page`,
+              value,
+            }))}
+            style={{ width: 130 }}
+            size="large"
+          />
+        </div>
       </div>
 
       {isLoading ? (
@@ -218,7 +237,7 @@ const ProductList: React.FC = () => {
             loading={isFetching}
             pagination={{
               current: currentPage,
-              pageSize: PAGE_SIZE,
+              pageSize,
               total: data?.total ?? 0,
               onChange: (page) => setCurrentPage(page),
               showSizeChanger: false,

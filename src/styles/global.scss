@@ -50,6 +50,10 @@
   margin-bottom: 20px;
   flex-wrap: wrap;
   align-items: center;
+
+  &__right {
+    margin-left: auto;
+  }
 }
 
 .error-container {
