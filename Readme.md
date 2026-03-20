@@ -11,15 +11,27 @@ A product management application built with React, TypeScript, Redux Toolkit, RT
 
 ### Installation
 
+Clone the repository
+
 ```bash
-# Clone the repository
-git clone <repository-url>
+git clone https://github.com/md-mh/react_Ts.git
+```
+
+Go to Project folder
+
+```bash
 cd react_Ts
+```
 
-# Install dependencies
+Install dependencies
+
+```bash
 npm install
+```
 
-# Start development server
+Start development server
+
+```bash
 npm start
 ```
 
