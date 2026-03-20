@@ -6,6 +6,10 @@ import type {
   ProductQueryParams,
 } from "../../types/product";
 
+const productsListTag = { type: "Products" as const, id: "LIST" };
+const productTag = (id: number) => ({ type: "Product" as const, id });
+const productsTag = (id: number) => ({ type: "Products" as const, id });
+
 export const productsApi = api
   .enhanceEndpoints({
     addTagTypes: ["Product", "Products"],
@@ -23,20 +27,14 @@ export const productsApi = api
           return `/products?limit=${limit}&skip=${skip}`;
         },
         providesTags: (result) =>
-          result
-            ? [
-                ...result.products.map(({ id }) => ({
-                  type: "Products" as const,
-                  id,
-                })),
-                { type: "Products", id: "LIST" },
-              ]
-            : [{ type: "Products", id: "LIST" }],
+          result?.products
+            ? [...result.products.map(({ id }) => productsTag(id)), productsListTag]
+            : [productsListTag],
       }),
 
       getProductById: builder.query<Product, number>({
         query: (id) => `/products/${id}`,
-        providesTags: (_result, _error, id) => [{ type: "Product", id }],
+        providesTags: (_result, _error, id) => [productTag(id)],
       }),
 
       getCategories: builder.query<ProductCategory[], void>({
@@ -53,7 +51,6 @@ export const productsApi = api
           body: data,
         }),
         async onQueryStarted({ id, data }, { dispatch, queryFulfilled }) {
-          // Optimistic update for product detail
           const patchDetail = dispatch(
             productsApi.util.updateQueryData("getProductById", id, (draft) => {
               Object.assign(draft, data);
@@ -65,13 +62,9 @@ export const productsApi = api
             patchDetail.undo();
           }
         },
-        invalidatesTags: (_result, _error, { id }) => [
-          { type: "Product", id },
-          { type: "Products", id: "LIST" },
-        ],
+        invalidatesTags: (_result, _error, { id }) => [productTag(id), productsListTag],
       }),
     }),
-    overrideExisting: false,
   });
 
 export const {
